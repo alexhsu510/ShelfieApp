@@ -1,0 +1,18 @@
+# Netlify copies this from public/ into the published dist/client directory.
+#
+# script-src keeps 'unsafe-inline' because TanStack Start emits inline hydration
+# scripts whose contents change per render, so they cannot be hashed. Locking
+# them down needs a per-request nonce generated in the SSR handler, which a
+# static headers file cannot provide. 'wasm-unsafe-eval' is required by the
+# barcode scanner's WebAssembly decoder.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.openfoodfacts.org; font-src 'self' data:; connect-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# Never let a stale API response be cached by an intermediary.
+/api/*
+  Cache-Control: no-store

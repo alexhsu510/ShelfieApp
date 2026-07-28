@@ -5,6 +5,48 @@ import { groceryItems, type NewGroceryItem } from '../../db/schema.js'
 
 const allowedListTypes = new Set(['pantry', 'shopping'])
 
+// Only these reach the client. Anything else is treated as an internal fault and
+// reported generically, so driver errors cannot leak the query or schema.
+class ValidationError extends Error {}
+
+const MAX_BARCODE_LENGTH = 32
+const MAX_IMAGE_URL_LENGTH = 1024
+
+function parseBarcode(value: unknown) {
+  if (typeof value !== 'string' || !value.trim()) return null
+  const barcode = value.trim()
+  if (!/^\d+$/.test(barcode) || barcode.length > MAX_BARCODE_LENGTH) {
+    throw new ValidationError('Barcode must be digits only.')
+  }
+  return barcode
+}
+
+function parseImageUrl(value: unknown) {
+  if (typeof value !== 'string' || !value.trim()) return null
+  const raw = value.trim()
+  if (raw.length > MAX_IMAGE_URL_LENGTH) throw new ValidationError('Image URL is too long.')
+  let parsed: URL
+  try {
+    parsed = new URL(raw)
+  } catch {
+    throw new ValidationError('Image URL must be a valid URL.')
+  }
+  // Every visitor's browser loads this, so keep it to https and nothing exotic
+  // like javascript: or data:.
+  if (parsed.protocol !== 'https:') throw new ValidationError('Image URL must use https.')
+  return parsed.toString()
+}
+
+function parseExpirationDate(value: unknown) {
+  if (typeof value !== 'string' || !value.trim()) return null
+  const date = value.trim()
+  // Validated here so a bad date is a 400 rather than a failed insert.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) {
+    throw new ValidationError('Expiration date must be formatted YYYY-MM-DD.')
+  }
+  return date
+}
+
 function futureDate(days: number) {
   const value = new Date()
   value.setUTCDate(value.getUTCDate() + days)
@@ -66,13 +108,13 @@ function parseItem(body: Record<string, unknown>, partial = false) {
 
   if (!partial || body.name !== undefined) {
     const name = typeof body.name === 'string' ? body.name.trim() : ''
-    if (!name) throw new Error('Item name is required.')
+    if (!name) throw new ValidationError('Item name is required.')
     item.name = name.slice(0, 120)
   }
 
   if (body.listType !== undefined) {
     if (typeof body.listType !== 'string' || !allowedListTypes.has(body.listType)) {
-      throw new Error('List type must be pantry or shopping.')
+      throw new ValidationError('List type must be pantry or shopping.')
     }
     item.listType = body.listType
   }
@@ -81,21 +123,19 @@ function parseItem(body: Record<string, unknown>, partial = false) {
     if (body[key] !== undefined) {
       const value = Number(body[key])
       if (!Number.isInteger(value) || value < 0 || value > 9999) {
-        throw new Error(`${key} must be a whole number between 0 and 9999.`)
+        throw new ValidationError(`${key} must be a whole number between 0 and 9999.`)
       }
       item[key] = value
     }
   }
 
-  for (const key of ['barcode', 'imageUrl', 'expirationDate'] as const) {
-    if (body[key] !== undefined) {
-      item[key] = typeof body[key] === 'string' && body[key] ? body[key] : null
-    }
-  }
+  if (body.barcode !== undefined) item.barcode = parseBarcode(body.barcode)
+  if (body.imageUrl !== undefined) item.imageUrl = parseImageUrl(body.imageUrl)
+  if (body.expirationDate !== undefined) item.expirationDate = parseExpirationDate(body.expirationDate)
 
   for (const key of ['unit', 'source'] as const) {
     if (body[key] !== undefined) {
-      if (typeof body[key] !== 'string' || !body[key].trim()) throw new Error(`${key} must be a non-empty string.`)
+      if (typeof body[key] !== 'string' || !body[key].trim()) throw new ValidationError(`${key} must be a non-empty string.`)
       item[key] = body[key].trim().slice(0, 80)
     }
   }
@@ -147,8 +187,12 @@ export default async (request: Request, context: Context) => {
 
     return jsonError('Method not allowed.', 405)
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Something went wrong.'
-    return jsonError(message, message.includes('required') || message.includes('must') ? 400 : 500)
+    if (error instanceof ValidationError) return jsonError(error.message, 400)
+    if (error instanceof SyntaxError) return jsonError('Request body must be valid JSON.', 400)
+    // Driver errors carry the full query, schema, and parameters, so log them
+    // rather than returning them.
+    console.error('items request failed:', error)
+    return jsonError('Something went wrong.', 500)
   }
 }
 
