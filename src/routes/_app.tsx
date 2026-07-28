@@ -22,8 +22,6 @@ function AppShell() {
 
   return (
     <div className="app-shell">
-      <div className="ambient ambient-one" />
-      <div className="ambient ambient-two" />
       <Header onAdd={() => openAdd('pantry')} />
       <MobileNav />
 
