@@ -97,6 +97,27 @@ export function AddItemModal({ destination, initialMode = 'search', onClose, onA
   )
 }
 
+const BARCODE_FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e'] as const
+
+type DetectorLike = { detect: (source: HTMLVideoElement) => Promise<Array<{ rawValue: string }>> }
+type DetectorCtor = new (options: { formats: string[] }) => DetectorLike
+
+// Safari (all iOS browsers) has never shipped BarcodeDetector, so fall back to a
+// WebAssembly decoder. Imported lazily: it pulls in ~1.1MB of wasm that should
+// not sit in the initial bundle for people who never open the scanner.
+async function loadDetector(): Promise<DetectorLike> {
+  const native = (window as unknown as { BarcodeDetector?: DetectorCtor }).BarcodeDetector
+  if (native) return new native({ formats: [...BARCODE_FORMATS] })
+
+  const [{ BarcodeDetector, setZXingModuleOverrides }, { default: wasmUrl }] = await Promise.all([
+    import('barcode-detector/ponyfill'),
+    import('zxing-wasm/reader/zxing_reader.wasm?url'),
+  ])
+  // Serve the wasm from our own origin; it otherwise loads from a jsDelivr CDN.
+  setZXingModuleOverrides({ locateFile: (path: string) => (path.endsWith('.wasm') ? wasmUrl : path) })
+  return new BarcodeDetector({ formats: [...BARCODE_FORMATS] })
+}
+
 function CameraScanner({ onCode, onFallback }: { onCode: (code: string) => void; onFallback: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -106,11 +127,16 @@ function CameraScanner({ onCode, onFallback }: { onCode: (code: string) => void;
   useEffect(() => {
     let cancelled = false
     let frame = 0
-    const BarcodeDetectorClass = (window as unknown as { BarcodeDetector?: new (options: { formats: string[] }) => { detect: (source: HTMLVideoElement) => Promise<Array<{ rawValue: string }>> } }).BarcodeDetector
 
     async function start() {
-      if (!navigator.mediaDevices?.getUserMedia || !BarcodeDetectorClass) {
-        setStatus('Live barcode detection is not supported on this browser. Enter the barcode below instead.')
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setStatus('This browser cannot open the camera. Enter the barcode below instead.')
+        return
+      }
+      // iOS only exposes the camera over HTTPS, so a plain-http LAN address
+      // fails here rather than at the permission prompt.
+      if (!window.isSecureContext) {
+        setStatus('Camera access needs a secure (https) connection. Enter the barcode below instead.')
         return
       }
       try {
@@ -120,8 +146,15 @@ function CameraScanner({ onCode, onFallback }: { onCode: (code: string) => void;
         if (!videoRef.current) return
         videoRef.current.srcObject = stream
         await videoRef.current.play()
+      } catch {
+        setStatus('Camera access was unavailable. Enter the barcode below instead.')
+        return
+      }
+      try {
+        setStatus('Starting the barcode reader…')
+        const detector = await loadDetector()
+        if (cancelled) return
         setStatus('Hold the barcode inside the frame')
-        const detector = new BarcodeDetectorClass({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] })
         const detect = async () => {
           if (cancelled || !videoRef.current) return
           try {
@@ -138,7 +171,7 @@ function CameraScanner({ onCode, onFallback }: { onCode: (code: string) => void;
         }
         frame = window.requestAnimationFrame(detect)
       } catch {
-        setStatus('Camera access was unavailable. Enter the barcode below instead.')
+        setStatus('The barcode reader could not start. Enter the barcode below instead.')
       }
     }
     void start()
