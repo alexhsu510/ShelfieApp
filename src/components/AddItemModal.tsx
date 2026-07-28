@@ -1,9 +1,9 @@
 import { ArrowLeft, Barcode, Camera, ChevronRight, LoaderCircle, PackageOpen, Plus, Search, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import type { Product } from '../lib/grocery'
+import type { AddMode, Product } from '../lib/grocery'
 
-export function AddItemModal({ destination, onClose, onAdded }: { destination: 'pantry' | 'shopping'; onClose: () => void; onAdded: (values: Record<string, unknown>) => Promise<void> }) {
-  const [mode, setMode] = useState<'search' | 'scan'>('search')
+export function AddItemModal({ destination, initialMode = 'search', onClose, onAdded }: { destination: 'pantry' | 'shopping'; initialMode?: AddMode; onClose: () => void; onAdded: (values: Record<string, unknown>) => Promise<void> }) {
+  const [mode, setMode] = useState<AddMode>(initialMode)
   const [query, setQuery] = useState('')
   const [products, setProducts] = useState<Product[]>([])
   const [selected, setSelected] = useState<Product | null>(null)

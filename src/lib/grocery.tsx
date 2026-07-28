@@ -62,9 +62,12 @@ type GroceryContextValue = {
   addItem: (values: Record<string, unknown>) => Promise<void>
   addOpen: boolean
   addDestination: 'pantry' | 'shopping'
-  openAdd: (destination: 'pantry' | 'shopping') => void
+  addMode: AddMode
+  openAdd: (destination: 'pantry' | 'shopping', mode?: AddMode) => void
   closeAdd: () => void
 }
+
+export type AddMode = 'search' | 'scan'
 
 const GroceryContext = createContext<GroceryContextValue | null>(null)
 
@@ -74,6 +77,7 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [addDestination, setAddDestination] = useState<'pantry' | 'shopping'>('pantry')
+  const [addMode, setAddMode] = useState<AddMode>('search')
   const [completedSuggestions, setCompletedSuggestions] = useState<Set<string>>(new Set())
 
   const loadItems = useCallback(async () => {
@@ -178,8 +182,9 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
-  const openAdd = useCallback((destination: 'pantry' | 'shopping') => {
+  const openAdd = useCallback((destination: 'pantry' | 'shopping', mode: AddMode = 'search') => {
     setAddDestination(destination)
+    setAddMode(mode)
     setAddOpen(true)
   }, [])
 
@@ -202,6 +207,7 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
     addItem,
     addOpen,
     addDestination,
+    addMode,
     openAdd,
     closeAdd,
   }

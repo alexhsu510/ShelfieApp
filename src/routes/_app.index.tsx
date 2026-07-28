@@ -10,7 +10,7 @@ function Overview() {
 
   return (
     <>
-      <WelcomeStrip pantryCount={pantry.length} expiringCount={expiring.length} shoppingCount={shoppingCount} onScan={() => openAdd('pantry')} />
+      <WelcomeStrip pantryCount={pantry.length} expiringCount={expiring.length} shoppingCount={shoppingCount} onScan={() => openAdd('pantry', 'scan')} />
       {loading ? (
         <LoadingState />
       ) : (

@@ -15,7 +15,7 @@ function AppLayout() {
 }
 
 function AppShell() {
-  const { error, setError, addOpen, addDestination, openAdd, closeAdd, addItem } = useGrocery()
+  const { error, setError, addOpen, addDestination, addMode, openAdd, closeAdd, addItem } = useGrocery()
   const location = useLocation()
   const onShoppingList = location.pathname === '/list'
   const onShop = location.pathname === '/shop'
@@ -40,7 +40,7 @@ function AppShell() {
       </main>
 
       {!onShop && (
-        <button className="scan-fab" type="button" onClick={() => openAdd(onShoppingList ? 'shopping' : 'pantry')}>
+        <button className="scan-fab" type="button" onClick={() => openAdd(onShoppingList ? 'shopping' : 'pantry', 'scan')}>
           <ScanLine size={21} />
           <span>Scan item</span>
         </button>
@@ -49,6 +49,7 @@ function AppShell() {
       {addOpen && (
         <AddItemModal
           destination={addDestination}
+          initialMode={addMode}
           onClose={closeAdd}
           onAdded={async (values) => {
             await addItem(values)
