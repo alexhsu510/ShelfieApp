@@ -16,7 +16,7 @@ function ShoppingListPage() {
   return (
     <section className="panel full-panel shopping-panel">
       <div className="view-heading">
-        <div><span className="eyebrow">Smart shopping list</span><h2>Buy only what you need</h2><p>Low and expired items appear here automatically.</p></div>
+        <div><span className="eyebrow">Smart shopping list</span><h2>Shopping list</h2></div>
         <div className="heading-actions">
           <button className="secondary-button" type="button" onClick={() => openAdd('shopping')}><Plus size={18} /> Add item</button>
           <Link className="primary-button" to="/shop"><ShoppingBasket size={18} /> Start shopping</Link>

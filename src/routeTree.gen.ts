@@ -14,7 +14,7 @@ import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 import { Route as AppPantryRouteImport } from './routes/_app.pantry'
 import { Route as AppListRouteImport } from './routes/_app.list'
-import { Route as AppPantryItemIdRouteImport } from './routes/_app.pantry.$itemId'
+import { Route as AppPantryItemIdRouteImport } from './routes/_app.pantry_.$itemId'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -41,21 +41,21 @@ const AppListRoute = AppListRouteImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 const AppPantryItemIdRoute = AppPantryItemIdRouteImport.update({
-  id: '/$itemId',
-  path: '/$itemId',
-  getParentRoute: () => AppPantryRoute,
+  id: '/pantry_/$itemId',
+  path: '/pantry/$itemId',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/list': typeof AppListRoute
-  '/pantry': typeof AppPantryRouteWithChildren
+  '/pantry': typeof AppPantryRoute
   '/shop': typeof AppShopRoute
   '/pantry/$itemId': typeof AppPantryItemIdRoute
 }
 export interface FileRoutesByTo {
   '/list': typeof AppListRoute
-  '/pantry': typeof AppPantryRouteWithChildren
+  '/pantry': typeof AppPantryRoute
   '/shop': typeof AppShopRoute
   '/': typeof AppIndexRoute
   '/pantry/$itemId': typeof AppPantryItemIdRoute
@@ -64,10 +64,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_app/list': typeof AppListRoute
-  '/_app/pantry': typeof AppPantryRouteWithChildren
+  '/_app/pantry': typeof AppPantryRoute
   '/_app/shop': typeof AppShopRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/pantry/$itemId': typeof AppPantryItemIdRoute
+  '/_app/pantry_/$itemId': typeof AppPantryItemIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,7 +81,7 @@ export interface FileRouteTypes {
     | '/_app/pantry'
     | '/_app/shop'
     | '/_app/'
-    | '/_app/pantry/$itemId'
+    | '/_app/pantry_/$itemId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -125,40 +125,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppListRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/pantry/$itemId': {
-      id: '/_app/pantry/$itemId'
-      path: '/$itemId'
+    '/_app/pantry_/$itemId': {
+      id: '/_app/pantry_/$itemId'
+      path: '/pantry/$itemId'
       fullPath: '/pantry/$itemId'
       preLoaderRoute: typeof AppPantryItemIdRouteImport
-      parentRoute: typeof AppPantryRoute
+      parentRoute: typeof AppRoute
     }
   }
 }
 
-interface AppPantryRouteChildren {
-  AppPantryItemIdRoute: typeof AppPantryItemIdRoute
-}
-
-const AppPantryRouteChildren: AppPantryRouteChildren = {
-  AppPantryItemIdRoute: AppPantryItemIdRoute,
-}
-
-const AppPantryRouteWithChildren = AppPantryRoute._addFileChildren(
-  AppPantryRouteChildren,
-)
-
 interface AppRouteChildren {
   AppListRoute: typeof AppListRoute
-  AppPantryRoute: typeof AppPantryRouteWithChildren
+  AppPantryRoute: typeof AppPantryRoute
   AppShopRoute: typeof AppShopRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppPantryItemIdRoute: typeof AppPantryItemIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppListRoute: AppListRoute,
-  AppPantryRoute: AppPantryRouteWithChildren,
+  AppPantryRoute: AppPantryRoute,
   AppShopRoute: AppShopRoute,
   AppIndexRoute: AppIndexRoute,
+  AppPantryItemIdRoute: AppPantryItemIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

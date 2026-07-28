@@ -1,5 +1,6 @@
 import { Link, Outlet, createFileRoute, useLocation } from '@tanstack/react-router'
-import { AlertTriangle, Leaf, ListChecks, Plus, Refrigerator, ScanLine, X } from 'lucide-react'
+import { AlertTriangle, Leaf, ListChecks, Moon, Plus, Refrigerator, ScanLine, Sun, X } from 'lucide-react'
+import { toggleTheme } from '../lib/theme'
 import { GroceryProvider, useGrocery } from '../lib/grocery'
 import { AddItemModal } from '../components/AddItemModal'
 
@@ -24,6 +25,7 @@ function AppShell() {
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
       <Header onAdd={() => openAdd('pantry')} />
+      <MobileNav />
 
       <main className="page-wrap">
         {error && (
@@ -71,14 +73,38 @@ function Header({ onAdd }: { onAdd: () => void }) {
           <NavButton to="/pantry" label="My pantry" />
           <NavButton to="/list" label="Shopping list" showCount />
         </nav>
-        <button className="primary-button compact" type="button" onClick={onAdd}><Plus size={17} /> Add item</button>
+        <div className="topbar-actions">
+          <ThemeToggle />
+          <button className="primary-button compact" type="button" onClick={onAdd}><Plus size={17} /> Add item</button>
+        </div>
       </div>
-      <nav className="mobile-nav" aria-label="Mobile navigation">
-        <Link to="/" activeProps={{ className: 'active' }} activeOptions={{ exact: true }}><Leaf size={18} />Home</Link>
-        <Link to="/pantry" activeProps={{ className: 'active' }}><Refrigerator size={18} />Pantry</Link>
-        <Link to="/list" activeProps={{ className: 'active' }}><ListChecks size={18} />List</Link>
-      </nav>
     </header>
+  )
+}
+
+function ThemeToggle() {
+  return (
+    <button
+      className="theme-toggle"
+      type="button"
+      aria-label="Toggle dark mode"
+      onClick={() => toggleTheme()}
+    >
+      <Sun className="icon-sun" size={17} />
+      <Moon className="icon-moon" size={17} />
+    </button>
+  )
+}
+
+// Rendered outside .topbar: its backdrop-filter would otherwise become the
+// containing block for this fixed bar and strand it at the top of the page.
+function MobileNav() {
+  return (
+    <nav className="mobile-nav" aria-label="Mobile navigation">
+      <Link to="/" activeProps={{ className: 'active' }} activeOptions={{ exact: true }}><Leaf size={18} />Home</Link>
+      <Link to="/pantry" activeProps={{ className: 'active' }}><Refrigerator size={18} />Pantry</Link>
+      <Link to="/list" activeProps={{ className: 'active' }}><ListChecks size={18} />List</Link>
+    </nav>
   )
 }
 

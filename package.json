@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "rm -f .netlify/v1/functions/server.mjs",
     "dev": "vite dev --port 3000",
     "build": "vite build"
   },

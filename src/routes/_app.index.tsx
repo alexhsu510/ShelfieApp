@@ -33,7 +33,7 @@ function Overview() {
 
           <div className="side-stack">
             <section className="panel attention-panel">
-              <SectionHeading icon={<CalendarClock size={18} />} title="Use these next" caption="Waste less" />
+              <SectionHeading icon={<CalendarClock size={18} />} title="Use these next" />
               <div className="attention-list">
                 {expiring.slice(0, 3).map((item) => <AttentionRow key={item.id} item={item} />)}
                 {expiring.length === 0 && <p className="quiet-note"><CircleCheck size={18} /> Nothing urgent. Nicely managed.</p>}
@@ -71,8 +71,7 @@ function WelcomeStrip({ pantryCount, expiringCount, shoppingCount, onScan }: { p
     <section className="welcome-strip">
       <div>
         <span className="eyebrow"><Sparkles size={14} /> Your kitchen, in sync</span>
-        <h1>Good food starts<br />with a <em>clear shelf.</em></h1>
-        <p>Track what you have, rescue what’s expiring, and shop without the guesswork.</p>
+        <h1>Overview</h1>
         <button className="primary-button hero-button" type="button" onClick={onScan}><ScanLine size={19} /> Scan a grocery</button>
       </div>
       <div className="hero-stats" aria-label="Grocery summary">

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ItemAvatar, LoadingState } from '../components/shared'
 import { expirationState, useGrocery } from '../lib/grocery'
 
-export const Route = createFileRoute('/_app/pantry/$itemId')({ component: ItemDetail })
+export const Route = createFileRoute('/_app/pantry_/$itemId')({ component: ItemDetail })
 
 function ItemDetail() {
   const { itemId } = Route.useParams()
@@ -40,7 +40,7 @@ function ItemDetail() {
   return (
     <section className="panel full-panel">
       <div className="view-heading">
-        <div><span className="eyebrow">Pantry item</span><h2>{item.name}</h2><p>{item.barcode ? `Barcode ${item.barcode}` : 'Pantry staple'}</p></div>
+        <div><span className="eyebrow">Pantry item</span><h2>{item.name}</h2></div>
       </div>
       <div className="item-details-form">
         <Link className="back-link" to="/pantry"><ArrowLeft size={16} /> Back to pantry</Link>

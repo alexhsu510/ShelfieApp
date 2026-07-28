@@ -20,7 +20,7 @@ export const Route = createRootRoute({
       },
       {
         name: 'theme-color',
-        content: '#f7f2e7',
+        content: '#0e1712',
       },
     ],
     links: [{ rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
@@ -28,10 +28,19 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
+// Runs before first paint so the stored theme is applied without a flash of the
+// wrong palette. Mirrors resolveTheme() in lib/theme.ts — dark unless the user
+// has explicitly chosen light.
+const themeBootScript = `try{var t=localStorage.getItem('shelfie-theme')}catch(e){}
+document.documentElement.dataset.theme=t==='light'?'light':'dark'`
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    // themeBootScript rewrites data-theme before hydration, so React would
+    // otherwise flag the server's "dark" against a restored "light".
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <HeadContent />
       </head>
       <body>

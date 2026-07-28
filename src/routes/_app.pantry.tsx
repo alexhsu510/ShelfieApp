@@ -17,7 +17,7 @@ function PantryPage() {
   return (
     <section className="panel full-panel">
       <div className="view-heading">
-        <div><span className="eyebrow">Pantry tracker</span><h2>Everything on the shelf</h2><p>Quantities and dates at a glance.</p></div>
+        <div><span className="eyebrow">Pantry tracker</span><h2>Pantry</h2></div>
         <button className="primary-button" type="button" onClick={() => openAdd('pantry')}><Plus size={18} /> Add pantry item</button>
       </div>
       <div className="search-field inline-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filter your pantry" /></div>

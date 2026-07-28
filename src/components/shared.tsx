@@ -2,11 +2,11 @@ import { Link } from '@tanstack/react-router'
 import { Check, ChevronRight, Clock3, Minus, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { expirationState, type GroceryItem } from '../lib/grocery'
 
-export function SectionHeading({ icon, title, caption, action, actionTo, onAction }: { icon: React.ReactNode; title: string; caption: string; action?: string; actionTo?: string; onAction?: () => void }) {
+export function SectionHeading({ icon, title, caption, action, actionTo, onAction }: { icon: React.ReactNode; title: string; caption?: string; action?: string; actionTo?: string; onAction?: () => void }) {
   return (
     <div className="section-heading">
       <div className="section-title-icon">{icon}</div>
-      <div><h2>{title}</h2><span>{caption}</span></div>
+      <div><h2>{title}</h2>{caption && <span>{caption}</span>}</div>
       {action && actionTo && <Link to={actionTo}>{action}<ChevronRight size={15} /></Link>}
       {action && !actionTo && <button type="button" onClick={onAction}>{action}<ChevronRight size={15} /></button>}
     </div>
@@ -30,7 +30,7 @@ export function PantryRow({ item, onQuantity, onDelete, linkToDetail }: { item: 
   const main = (
     <>
       <ItemAvatar item={item} />
-      <div className="item-main"><strong>{item.name}</strong><span>{item.barcode ? `Barcode ${item.barcode}` : 'Pantry staple'}</span></div>
+      <div className="item-main"><strong>{item.name}</strong>{item.barcode && <span>Barcode {item.barcode}</span>}</div>
     </>
   )
   return (

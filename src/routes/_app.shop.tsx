@@ -19,7 +19,7 @@ function ShopModePage() {
         <span>{checked}/{total}</span>
       </div>
       <div className="shop-progress"><span style={{ width: `${progress}%` }} /></div>
-      <div className="shop-mode-heading"><span className="eyebrow">Today’s run</span><h1>{checked === total && total > 0 ? 'Cart complete.' : 'Let’s fill the basket.'}</h1><p>Big tap targets, no distractions.</p></div>
+      <div className="shop-mode-heading"><span className="eyebrow">Today’s run</span><h1>{checked === total && total > 0 ? 'Complete' : 'Basket'}</h1></div>
       <div className="shop-checklist">
         {suggestions.map((item) => <ShopCheckRow key={item.key} name={item.name} note={item.reason} checked={item.checked} onToggle={() => toggleSuggestion(item.key)} />)}
         {manualShopping.map((item) => <ShopCheckRow key={item.id} name={item.name} note={`${item.quantity} ${item.unit}`} checked={item.checked} onToggle={() => void updateItem(item.id, { checked: !item.checked })} />)}

@@ -37,7 +37,7 @@ body {
 
 button, input, select { font: inherit; }
 button { color: inherit; }
-button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(29, 77, 56, 0.22); outline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(29, 77, 56, 0.22); outline-offset: 2px; }
 
 .app-shell { min-height: 100vh; position: relative; overflow: hidden; }
 .ambient { position: fixed; border-radius: 999px; filter: blur(2px); pointer-events: none; z-index: 0; }
@@ -49,17 +49,17 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .brand { justify-self: start; display: inline-flex; align-items: center; gap: 11px; border: 0; background: none; cursor: pointer; font-family: Georgia, serif; font-size: 24px; font-weight: 700; letter-spacing: -1px; }
 .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; color: var(--cream); border-radius: 14px 14px 14px 4px; background: var(--forest); transform: rotate(-2deg); }
 .desktop-nav { display: flex; align-items: center; gap: 4px; padding: 5px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 253, 247, 0.68); }
-.desktop-nav button { position: relative; display: flex; align-items: center; gap: 7px; padding: 9px 15px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-soft); font-size: 13px; font-weight: 700; cursor: pointer; transition: 180ms ease; }
-.desktop-nav button:hover, .desktop-nav button.active { color: var(--ink); background: var(--paper); box-shadow: 0 3px 12px rgba(24, 56, 42, 0.08); }
+.desktop-nav a { position: relative; display: flex; align-items: center; gap: 7px; padding: 9px 15px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-soft); font-size: 13px; font-weight: 700; cursor: pointer; transition: 180ms ease; }
+.desktop-nav a:hover, .desktop-nav a.active { color: var(--ink); background: var(--paper); box-shadow: 0 3px 12px rgba(24, 56, 42, 0.08); }
 .nav-count { min-width: 19px; height: 19px; padding: 0 5px; display: grid; place-items: center; border-radius: 99px; background: var(--coral); color: white; font-size: 10px; }
-.topbar-inner > .primary-button { justify-self: end; }
+.topbar-inner .primary-button { justify-self: end; }
 .mobile-nav { display: none; }
 
 .page-wrap { position: relative; z-index: 1; width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 44px 0 110px; }
 .welcome-strip { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.65fr); align-items: end; gap: 64px; padding: 28px 12px 49px; animation: rise-in 520ms ease both; }
 .eyebrow { display: inline-flex; align-items: center; gap: 7px; color: #66863c; font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
 .welcome-strip h1, .view-heading h2, .shop-mode-heading h1, .modal-header h2 { margin: 12px 0 14px; font-family: Georgia, "Times New Roman", serif; font-weight: 500; letter-spacing: -0.045em; line-height: 0.98; }
-.welcome-strip h1 { max-width: 720px; font-size: clamp(48px, 6.3vw, 78px); }
+.welcome-strip h1 { max-width: 720px; font-size: clamp(34px, 4vw, 48px); }
 .welcome-strip h1 em { color: #7aa13e; font-weight: 500; }
 .welcome-strip p { max-width: 560px; margin: 0; color: var(--ink-soft); font-size: 16px; line-height: 1.7; }
 .hero-button { margin-top: 24px; }
@@ -260,7 +260,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .hero-stats { min-height: 110px; }
   .dashboard-grid { grid-template-columns: 1fr; }
   .side-stack { grid-template-columns: 1fr 1fr; }
-  .scan-fab { right: 20px; }
+  .scan-fab { right: 20px; bottom: 82px; }
+  .mobile-nav { position: fixed; left: 12px; right: 12px; bottom: 10px; z-index: 45; display: grid; grid-template-columns: repeat(3, 1fr); padding: 6px; border: 1px solid rgba(24, 56, 42, 0.16); border-radius: 20px; background: rgba(255, 253, 247, 0.94); box-shadow: 0 15px 40px rgba(24, 56, 42, 0.18); backdrop-filter: blur(18px); }
+  .mobile-nav a { min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; border-radius: 14px; color: var(--ink-soft); background: transparent; font-size: 9px; font-weight: 800; }
+  .mobile-nav a.active { color: var(--forest); background: var(--mint); }
 }
 
 @media (max-width: 680px) {
@@ -268,14 +271,11 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .topbar-inner { width: calc(100% - 28px); height: 68px; }
   .brand { font-size: 21px; }
   .brand-mark { width: 38px; height: 38px; }
-  .topbar-inner > .primary-button { padding: 0 13px; min-height: 38px; }
-  .topbar-inner > .primary-button svg { display: none; }
-  .mobile-nav { position: fixed; left: 12px; right: 12px; bottom: 10px; z-index: 45; display: grid; grid-template-columns: repeat(3, 1fr); padding: 6px; border: 1px solid rgba(24, 56, 42, 0.16); border-radius: 20px; background: rgba(255, 253, 247, 0.94); box-shadow: 0 15px 40px rgba(24, 56, 42, 0.18); backdrop-filter: blur(18px); }
-  .mobile-nav button { min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; border-radius: 14px; color: var(--ink-soft); background: transparent; font-size: 9px; font-weight: 800; }
-  .mobile-nav button.active { color: var(--forest); background: var(--mint); }
+  .topbar-inner .primary-button { padding: 0 13px; min-height: 38px; }
+  .topbar-inner .primary-button svg { display: none; }
   .page-wrap { width: calc(100% - 24px); padding-top: 25px; padding-bottom: 100px; }
   .welcome-strip { padding: 20px 5px 34px; }
-  .welcome-strip h1 { font-size: clamp(45px, 14vw, 64px); }
+  .welcome-strip h1 { font-size: clamp(32px, 9vw, 44px); }
   .welcome-strip p { font-size: 14px; }
   .hero-stats { border-radius: 22px 22px 22px 7px; }
   .hero-stats div { padding: 17px 12px; }
@@ -316,3 +316,94 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* ---- Theme toggle control ---- */
+.theme-toggle { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--ink-soft); background: var(--surface-quiet); cursor: pointer; transition: color 160ms ease, background 160ms ease; }
+.theme-toggle:hover { color: var(--ink); background: var(--mint); }
+/* Both icons ship in the markup and CSS picks one, so the server and client
+   render identical HTML (no hydration mismatch from reading the theme). */
+.theme-toggle .icon-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+.topbar-inner > .topbar-actions { justify-self: end; display: flex; align-items: center; gap: 10px; }
+
+/* ---- Dark theme ---- */
+:root { --surface-quiet: rgba(255, 253, 247, 0.68); --surface-panel: rgba(255, 253, 247, 0.91); --surface-solid: #ffffff; --on-lime: #1b2e10; }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e7efe7;
+  --ink-soft: #9bb0a1;
+  --cream: #0e1712;
+  --paper: #17231c;
+  --forest: #3c9169;
+  --mint: #21362a;
+  --line: rgba(200, 228, 207, 0.15);
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --surface-quiet: rgba(28, 42, 33, 0.7);
+  --surface-panel: rgba(24, 37, 29, 0.92);
+  --surface-solid: #1b2a21;
+}
+
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 18% 2%, rgba(104, 148, 70, 0.15), transparent 29rem),
+    radial-gradient(circle at 93% 28%, rgba(150, 116, 60, 0.11), transparent 24rem),
+    var(--cream);
+}
+
+[data-theme="dark"] .topbar { background: rgba(14, 23, 18, 0.88); }
+[data-theme="dark"] .desktop-nav,
+[data-theme="dark"] .hero-stats { background: var(--surface-quiet); }
+[data-theme="dark"] .panel { background: var(--surface-panel); }
+[data-theme="dark"] .mobile-nav { background: rgba(20, 32, 25, 0.94); border-color: rgba(200, 228, 207, 0.18); }
+[data-theme="dark"] .desktop-nav a:hover,
+[data-theme="dark"] .desktop-nav a.active,
+[data-theme="dark"] .mode-tabs button.active { background: var(--surface-solid); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35); }
+[data-theme="dark"] .ambient-two { border-color: rgba(200, 228, 207, 0.09); }
+
+[data-theme="dark"] .quantity-control,
+[data-theme="dark"] .list-checkbox,
+[data-theme="dark"] .large-check,
+[data-theme="dark"] .search-field,
+[data-theme="dark"] .form-grid input,
+[data-theme="dark"] .form-grid select,
+[data-theme="dark"] .manual-barcode input { background: var(--surface-solid); }
+[data-theme="dark"] .list-checkbox, [data-theme="dark"] .large-check { border-color: #4c6b52; color: var(--surface-solid); }
+[data-theme="dark"] .shopping-row.checked .list-checkbox,
+[data-theme="dark"] .shop-check-row.checked .large-check { color: #0e1712; }
+[data-theme="dark"] .mini-check { border-color: #4c6b52; }
+[data-theme="dark"] .search-field { color: var(--ink-soft); }
+[data-theme="dark"] .mode-tabs, [data-theme="dark"] .shop-progress { background: #202f26; }
+
+/* Item art is authored for a light card; multiply would smear it on dark. */
+[data-theme="dark"] .item-avatar, [data-theme="dark"] .product-image { background: linear-gradient(145deg, #24362a, #1c2b22); }
+[data-theme="dark"] .item-avatar img, [data-theme="dark"] .product-image img { mix-blend-mode: normal; }
+[data-theme="dark"] .item-avatar { border-color: rgba(200, 228, 207, 0.1); }
+
+[data-theme="dark"] .date-pill.fresh { color: #b7d98a; background: #24331b; }
+[data-theme="dark"] .date-pill.warning { color: #e9bf72; background: #382e17; }
+[data-theme="dark"] .date-pill.danger { color: #f0a08c; background: #3c2018; }
+[data-theme="dark"] .date-pill.neutral { color: var(--ink-soft); background: #26302a; }
+[data-theme="dark"] .status-text.warning { color: #e0ac5b; }
+[data-theme="dark"] .delete-button:hover { background: #3a201a; }
+[data-theme="dark"] .error-banner { color: #f3b6a6; border-color: #6d3428; background: #331913; }
+[data-theme="dark"] .inline-message { color: #e6c08a; background: #33260f; }
+
+[data-theme="dark"] .suggestion-block { border-color: #35492a; background: #1c2a19; }
+[data-theme="dark"] .suggestion-heading { color: #9dc26a; border-color: #35492a; }
+[data-theme="dark"] .suggestion-block .shopping-row { border-color: rgba(157, 194, 106, 0.16); }
+[data-theme="dark"] .smart-dot { color: #b7d98a; background: #2a3b1e; }
+[data-theme="dark"] .auto-label, [data-theme="dark"] .eyebrow { color: #9dc26a; }
+[data-theme="dark"] .welcome-strip h1 em { color: #a9d167; }
+[data-theme="dark"] .section-heading > button, [data-theme="dark"] .section-heading > a,
+[data-theme="dark"] .back-link, [data-theme="dark"] .text-button { color: #9dc26a; }
+[data-theme="dark"] .quiet-note svg, [data-theme="dark"] .empty-state > span { color: #9dc26a; }
+[data-theme="dark"] .product-results > button:hover, [data-theme="dark"] .selected-product { background: #1e2c23; }
+
+/* --ink flips light in dark mode, which would be unreadable on the lime FAB. */
+[data-theme="dark"] .scan-fab { color: var(--on-lime); border-color: #8fb944; }
+[data-theme="dark"] .skeleton { background: #1e2a23; }
+[data-theme="dark"] .skeleton::after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent); }
+[data-theme="dark"] .modal-card { border-color: rgba(200, 228, 207, 0.12); }
+[data-theme="dark"] .shopping-row.checked strong { color: #7c8c81; }

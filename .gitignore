@@ -1,2 +1,5 @@
 # Local Netlify folder
 .netlify
+
+# Build output (Netlify runs `vite build` at deploy time)
+dist
