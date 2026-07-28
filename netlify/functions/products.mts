@@ -14,6 +14,16 @@ function normalizeBrand(brands: FoodFactsProduct['brands']) {
   return (Array.isArray(brands) ? brands.join(', ') : (brands ?? '')).trim()
 }
 
+// Restrict text search to products sold in the US. The value must stay quoted:
+// the colon in `en:united-states` is otherwise read as a Lucene field separator.
+const COUNTRY_FILTER = 'countries_tags:"en:united-states"'
+
+// The query is interpolated into Lucene syntax, where a bare `:` turns the
+// preceding word into a field name and an odd `"` breaks parsing outright.
+function escapeLucene(query: string) {
+  return query.replace(/(&&|\|\||[+\-!(){}[\]^"~*?:\\/])/g, '\\$1')
+}
+
 function normalizeProduct(product: FoodFactsProduct) {
   const brand = normalizeBrand(product.brands)
   return {
@@ -25,8 +35,18 @@ function normalizeProduct(product: FoodFactsProduct) {
   }
 }
 
+// Netlify hands path params through still percent-encoded, so a two-word search
+// arrived as "greek%20yogurt" and matched the literal "%20" as a search term.
+function decodeParam(raw: string) {
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return raw // malformed escape (a lone "%"); search the text as typed
+  }
+}
+
 export default async (_request: Request, context: Context) => {
-  const query = context.params.query?.trim()
+  const query = decodeParam(context.params.query ?? '').trim()
   if (!query) return Response.json({ error: 'Enter a product name or barcode.' }, { status: 400 })
 
   try {
@@ -44,7 +64,14 @@ export default async (_request: Request, context: Context) => {
     // Open Food Facts retired the legacy /cgi/search.pl endpoint (it now 503s);
     // search.openfoodfacts.org is the supported replacement. It returns matches
     // under `hits` rather than `products`.
-    const params = new URLSearchParams({ q: query, page_size: '8', fields })
+    //
+    // Filter and search terms are space-separated, not joined with AND: `AND`
+    // makes multi-word queries ("oat milk") match nothing at all.
+    const params = new URLSearchParams({
+      q: `${COUNTRY_FILTER} ${escapeLucene(query)}`,
+      page_size: '8',
+      fields,
+    })
     const response = await fetch(`https://search.openfoodfacts.org/search?${params}`, {
       headers: { 'User-Agent': 'Shelfie Grocery Manager/1.0' },
     })
