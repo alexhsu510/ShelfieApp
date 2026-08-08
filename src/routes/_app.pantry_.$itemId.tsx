@@ -1,7 +1,7 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Clock3, Minus, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { ItemAvatar, LoadingState } from '../components/shared'
+import { ItemAvatar, LoadingState, StockMeter } from '../components/shared'
 import { expirationState, useGrocery } from '../lib/grocery'
 
 export const Route = createFileRoute('/_app/pantry_/$itemId')({ component: ItemDetail })
@@ -49,6 +49,7 @@ function ItemDetail() {
           <div>
             <strong>{item.name}</strong>
             <span className={`status-text ${status.tone}`}><Clock3 size={13} /> {status.label}</span>
+            <StockMeter item={item} />
           </div>
         </div>
         <div className="form-grid">

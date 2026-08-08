@@ -9,6 +9,7 @@ Shelfie is a responsive pantry and grocery-list application built with TanStack 
 - `src/routes/__root.tsx` defines the document shell and site metadata.
 - `src/routes/index.tsx` contains the interactive single-page grocery experience and its feature components.
 - `src/styles.css` contains the global visual system, responsive layouts, and component states.
+- `src/lib/layout.ts` exposes the desktop breakpoints as media-query hooks so panels can render more rows when the viewport widens.
 - `netlify/functions/items.mts` exposes persistent grocery-item CRUD routes at `/api/items`.
 - `netlify/functions/products.mts` proxies barcode and name searches to Open Food Facts at `/api/products/:query`.
 - `db/schema.ts` is the source of truth for the Drizzle database schema.
@@ -38,6 +39,9 @@ The items API inserts a small starter pantry only when the database is completel
 - Shopping suggestions are intentionally computed from pantry state rather than duplicated in the database.
 - Camera access requires HTTPS in production; Netlify-hosted deployments provide this automatically.
 - The application has no authentication, so the deployed site currently represents one shared household pantry.
+- The shell width comes from the `--shell-max` / `--shell-gutter` / `--shell-width` custom properties. Past 1280px it tracks the viewport (capped at 1680px) instead of holding at 1180px, so widening the desktop layout means editing those tokens rather than each full-bleed row.
+- Extra width buys extra detail, not longer lines: at 1280px rows gain a stock meter and a fourth hero stat, and at 1560px the dashboard side panels become peers of the pantry column while the pantry and shopping lists split into two columns. Row counts scale alongside via `useLayoutDensity`, whose breakpoints must stay in sync with the `min-width` queries in `styles.css`.
+- `useMediaQuery` returns `false` during SSR, so the server renders the compact layout and the client widens it after hydration.
 
 ## Local Development
 

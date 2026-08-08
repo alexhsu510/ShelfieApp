@@ -25,6 +25,22 @@ export function LoadingState() {
   return <div className="loading-layout"><div className="skeleton hero-skeleton" /><div className="dashboard-grid"><div className="skeleton panel-skeleton" /><div className="side-stack"><div className="skeleton small-skeleton" /><div className="skeleton small-skeleton" /></div></div><span className="loading-caption"><RotateCcw className="spin" size={16} /> Checking your shelves…</span></div>
 }
 
+/** Stock against the restock point. Hidden by CSS until the row has a spare column. */
+export function StockMeter({ item }: { item: GroceryItem }) {
+  const low = item.quantity <= item.minimumQuantity
+  const full = Math.max(item.minimumQuantity * 2, 1)
+  const fill = Math.min(100, Math.round((item.quantity / full) * 100))
+  return (
+    <div className="stock-meter">
+      <span className={`stock-track ${low ? 'low' : ''}`}><span style={{ width: `${fill}%` }} /></span>
+      <small>
+        {item.quantity} {item.unit}{item.quantity === 1 ? '' : 's'}
+        {item.minimumQuantity > 0 ? ` · ${low ? 'below' : 'restock at'} ${item.minimumQuantity}` : ' · no restock point'}
+      </small>
+    </div>
+  )
+}
+
 export function PantryRow({ item, onQuantity, onDelete, linkToDetail }: { item: GroceryItem; onQuantity: (item: GroceryItem, delta: number) => void; onDelete: (id: number) => void; linkToDetail?: boolean }) {
   const status = expirationState(item.expirationDate)
   const main = (
@@ -38,6 +54,7 @@ export function PantryRow({ item, onQuantity, onDelete, linkToDetail }: { item: 
       {linkToDetail ? (
         <Link className="pantry-row-link" to="/pantry/$itemId" params={{ itemId: String(item.id) }}>{main}</Link>
       ) : main}
+      <StockMeter item={item} />
       <div className={`date-pill ${status.tone}`}><Clock3 size={14} /><span>{status.label}</span></div>
       <div className="quantity-control">
         <button type="button" onClick={() => onQuantity(item, -1)} aria-label={`Reduce ${item.name}`}><Minus size={14} /></button>
