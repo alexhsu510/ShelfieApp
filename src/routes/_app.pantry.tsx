@@ -7,7 +7,7 @@ import { useGrocery } from '../lib/grocery'
 export const Route = createFileRoute('/_app/pantry')({ component: PantryPage })
 
 function PantryPage() {
-  const { loading, pantry, openAdd, updateItem, deleteItem } = useGrocery()
+  const { loading, pantry, shoppingNames, openAdd, updateItem, deleteItem, addToShoppingList } = useGrocery()
   const [query, setQuery] = useState('')
 
   if (loading) return <LoadingState />
@@ -29,6 +29,8 @@ function PantryPage() {
             linkToDetail
             onQuantity={(target, delta) => void updateItem(target.id, { quantity: Math.max(0, target.quantity + delta) })}
             onDelete={(id) => void deleteItem(id)}
+            onAddToList={(target) => void addToShoppingList(target)}
+            onList={shoppingNames.has(item.name.toLowerCase())}
           />
         ))}
         {filtered.length === 0 && <EmptyState icon={<PackageOpen />} title="No matching groceries" text="Try a different search or add something new." onAction={() => openAdd('pantry')} />}

@@ -52,6 +52,8 @@ type GroceryContextValue = {
   setError: (error: string) => void
   pantry: GroceryItem[]
   manualShopping: GroceryItem[]
+  /** Lowercased names already on the shopping list, for de-duplicating additions. */
+  shoppingNames: Set<string>
   suggestions: SuggestedItem[]
   expiring: GroceryItem[]
   shoppingCount: number
@@ -60,6 +62,7 @@ type GroceryContextValue = {
   updateItem: (id: number, changes: Partial<GroceryItem>) => Promise<void>
   deleteItem: (id: number) => Promise<void>
   addItem: (values: Record<string, unknown>) => Promise<void>
+  addToShoppingList: (item: GroceryItem) => Promise<void>
   addOpen: boolean
   addDestination: 'pantry' | 'shopping'
   addMode: AddMode
@@ -104,12 +107,12 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
     () => items.filter((item) => item.listType === 'shopping'),
     [items],
   )
+  const shoppingNames = useMemo(() => new Set(manualShopping.map((item) => item.name.toLowerCase())), [manualShopping])
   const suggestions = useMemo<SuggestedItem[]>(() => {
-    const existingNames = new Set(manualShopping.map((item) => item.name.toLowerCase()))
     return pantry
       .filter((item) => {
         const expiry = expirationState(item.expirationDate)
-        return (item.quantity <= item.minimumQuantity || expiry.days < 0) && !existingNames.has(item.name.toLowerCase())
+        return (item.quantity <= item.minimumQuantity || expiry.days < 0) && !shoppingNames.has(item.name.toLowerCase())
       })
       .map((item) => {
         const expiry = expirationState(item.expirationDate)
@@ -122,7 +125,7 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
           suggested: true,
         }
       })
-  }, [completedSuggestions, manualShopping, pantry])
+  }, [completedSuggestions, shoppingNames, pantry])
 
   const expiring = useMemo(
     () => pantry.filter((item) => expirationState(item.expirationDate).days <= 3).sort((a, b) => expirationState(a.expirationDate).days - expirationState(b.expirationDate).days),
@@ -174,6 +177,27 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
     setItems((current) => [...current, data.item as GroceryItem])
   }, [])
 
+  /**
+   * Copies a pantry record onto the shopping list. The quantity is the gap back
+   * to the restock point, so a pantry item that is two short is bought two at a
+   * time rather than one.
+   */
+  const addToShoppingList = useCallback(async (item: GroceryItem) => {
+    try {
+      await addItem({
+        name: item.name,
+        listType: 'shopping',
+        quantity: Math.max(1, item.minimumQuantity - item.quantity),
+        unit: item.unit,
+        barcode: item.barcode ?? undefined,
+        imageUrl: item.imageUrl ?? undefined,
+        source: 'pantry',
+      })
+    } catch (addError) {
+      setError(addError instanceof Error ? addError.message : 'Could not add that item to your list.')
+    }
+  }, [addItem])
+
   const toggleSuggestion = useCallback((key: string) => {
     setCompletedSuggestions((current) => {
       const next = new Set(current)
@@ -197,6 +221,7 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
     setError,
     pantry,
     manualShopping,
+    shoppingNames,
     suggestions,
     expiring,
     shoppingCount,
@@ -205,6 +230,7 @@ export function GroceryProvider({ children }: { children: React.ReactNode }) {
     updateItem,
     deleteItem,
     addItem,
+    addToShoppingList,
     addOpen,
     addDestination,
     addMode,

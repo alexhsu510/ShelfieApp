@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Clock3, Minus, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Check, Clock3, ListPlus, Minus, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { ItemAvatar, LoadingState, StockMeter } from '../components/shared'
 import { expirationState, useGrocery } from '../lib/grocery'
@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_app/pantry_/$itemId')({ component: ItemD
 
 function ItemDetail() {
   const { itemId } = Route.useParams()
-  const { loading, pantry, updateItem, deleteItem } = useGrocery()
+  const { loading, pantry, shoppingNames, updateItem, deleteItem, addToShoppingList } = useGrocery()
   const navigate = useNavigate()
   const [expirationDate, setExpirationDate] = useState<string | null>(null)
 
@@ -31,6 +31,7 @@ function ItemDetail() {
 
   const status = expirationState(item.expirationDate)
   const currentExpiration = expirationDate ?? item.expirationDate ?? ''
+  const onList = shoppingNames.has(item.name.toLowerCase())
 
   async function handleDelete() {
     await deleteItem(item!.id)
@@ -53,14 +54,16 @@ function ItemDetail() {
           </div>
         </div>
         <div className="form-grid">
-          <label>
-            Quantity
-            <div className="quantity-control">
+          {/* Not a <label>: a label forwards its clicks to the first button
+              inside it, so clicking the caption used to fire the minus step. */}
+          <div className="field">
+            <span>Quantity</span>
+            <div className="quantity-control" role="group" aria-label={`Quantity of ${item.name}`}>
               <button type="button" onClick={() => void updateItem(item.id, { quantity: Math.max(0, item.quantity - 1) })} aria-label={`Reduce ${item.name}`}><Minus size={14} /></button>
               <span><b>{item.quantity}</b><small>{item.unit}</small></span>
               <button type="button" onClick={() => void updateItem(item.id, { quantity: item.quantity + 1 })} aria-label={`Add ${item.name}`}><Plus size={14} /></button>
             </div>
-          </label>
+          </div>
           <label>Restock when at<input type="number" min="0" value={item.minimumQuantity} onChange={(event) => void updateItem(item.id, { minimumQuantity: Math.max(0, Number(event.target.value)) })} /></label>
           <label>
             Best by / expires
@@ -75,9 +78,14 @@ function ItemDetail() {
           </label>
           <label>Barcode<input value={item.barcode ?? ''} disabled placeholder="No barcode on file" /></label>
         </div>
-        <button className="primary-button wide save-button danger-button" type="button" onClick={() => void handleDelete()}>
-          <Trash2 size={18} /> Remove from pantry
-        </button>
+        <div className="detail-actions">
+          <button className="secondary-button" type="button" onClick={() => void addToShoppingList(item)} disabled={onList}>
+            {onList ? <><Check size={18} /> On your shopping list</> : <><ListPlus size={18} /> Add to shopping list</>}
+          </button>
+          <button className="primary-button danger-button" type="button" onClick={() => void handleDelete()}>
+            <Trash2 size={18} /> Remove from pantry
+          </button>
+        </div>
       </div>
     </section>
   )

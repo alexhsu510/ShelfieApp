@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Check, ChevronRight, Clock3, Minus, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { Check, ChevronRight, Clock3, ListPlus, Minus, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { expirationState, type GroceryItem } from '../lib/grocery'
 
 export function SectionHeading({ icon, title, caption, action, actionTo, onAction }: { icon: React.ReactNode; title: string; caption?: string; action?: string; actionTo?: string; onAction?: () => void }) {
@@ -41,7 +41,7 @@ export function StockMeter({ item }: { item: GroceryItem }) {
   )
 }
 
-export function PantryRow({ item, onQuantity, onDelete, linkToDetail }: { item: GroceryItem; onQuantity: (item: GroceryItem, delta: number) => void; onDelete: (id: number) => void; linkToDetail?: boolean }) {
+export function PantryRow({ item, onQuantity, onDelete, onAddToList, onList, linkToDetail }: { item: GroceryItem; onQuantity: (item: GroceryItem, delta: number) => void; onDelete: (id: number) => void; onAddToList: (item: GroceryItem) => void; onList: boolean; linkToDetail?: boolean }) {
   const status = expirationState(item.expirationDate)
   const main = (
     <>
@@ -61,6 +61,16 @@ export function PantryRow({ item, onQuantity, onDelete, linkToDetail }: { item: 
         <span><b>{item.quantity}</b><small>{item.unit}</small></span>
         <button type="button" onClick={() => onQuantity(item, 1)} aria-label={`Add ${item.name}`}><Plus size={14} /></button>
       </div>
+      <button
+        className={`icon-button list-button ${onList ? 'on-list' : ''}`}
+        type="button"
+        onClick={() => onAddToList(item)}
+        disabled={onList}
+        title={onList ? `${item.name} is already on your shopping list` : `Add ${item.name} to your shopping list`}
+        aria-label={onList ? `${item.name} is already on your shopping list` : `Add ${item.name} to your shopping list`}
+      >
+        {onList ? <Check size={16} /> : <ListPlus size={16} />}
+      </button>
       <button className="icon-button delete-button" type="button" onClick={() => onDelete(item.id)} aria-label={`Delete ${item.name}`}><Trash2 size={16} /></button>
     </div>
   )

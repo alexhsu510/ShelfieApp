@@ -7,7 +7,7 @@ import { useLayoutDensity } from '../lib/layout'
 export const Route = createFileRoute('/_app/')({ component: Overview })
 
 function Overview() {
-  const { loading, pantry, manualShopping, suggestions, expiring, shoppingCount, openAdd, updateItem, deleteItem } = useGrocery()
+  const { loading, pantry, manualShopping, shoppingNames, suggestions, expiring, shoppingCount, openAdd, updateItem, deleteItem, addToShoppingList } = useGrocery()
   const { pantryPreview, attentionPreview, listPreview } = useLayoutDensity()
 
   const pendingShopping = manualShopping.filter((item) => !item.checked)
@@ -31,6 +31,8 @@ function Overview() {
                   linkToDetail
                   onQuantity={(target, delta) => void updateItem(target.id, { quantity: Math.max(0, target.quantity + delta) })}
                   onDelete={(id) => void deleteItem(id)}
+                  onAddToList={(target) => void addToShoppingList(target)}
+                  onList={shoppingNames.has(item.name.toLowerCase())}
                 />
               ))}
               {pantry.length === 0 && <EmptyState icon={<PackageOpen />} title="Your shelves are waiting" text="Scan or add your first pantry item." onAction={() => openAdd('pantry')} />}

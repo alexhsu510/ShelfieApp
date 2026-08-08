@@ -95,7 +95,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 .pantry-list { padding: 6px 20px 12px; }
 .pantry-list.roomy { padding: 10px 28px 28px; }
-.pantry-row { min-height: 82px; display: grid; grid-template-columns: auto minmax(120px, 1fr) auto auto auto; align-items: center; gap: 15px; padding: 12px 4px; border-bottom: 1px dashed rgba(24, 56, 42, 0.12); }
+.pantry-row { min-height: 82px; display: grid; grid-template-columns: auto minmax(120px, 1fr) auto auto auto auto; align-items: center; gap: 15px; padding: 12px 4px; border-bottom: 1px dashed rgba(24, 56, 42, 0.12); }
 .pantry-row:last-child { border-bottom: 0; }
 .pantry-row-link { display: contents; color: inherit; text-decoration: none; cursor: pointer; }
 .item-avatar, .product-image { flex: 0 0 auto; overflow: hidden; display: grid; place-items: center; color: var(--forest); background: linear-gradient(145deg, #f1f5df, #e4efd5); }
@@ -127,8 +127,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 .icon-button { width: 38px; height: 38px; border-radius: 12px; }
 .icon-button:hover { background: var(--mint); }
+.icon-button:disabled { cursor: default; }
 .delete-button { color: #9a9d91; }
 .delete-button:hover { color: var(--coral); background: #fff0eb; }
+.list-button { color: #7f9a63; }
+.list-button:hover { color: var(--forest); background: var(--mint); }
+.list-button.on-list { color: #8aa77c; background: var(--mint); }
 
 .attention-list { padding: 9px 20px 15px; }
 .attention-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 10px 2px; color: inherit; text-decoration: none; }
@@ -206,7 +210,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .mode-tabs button { min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 11px; background: transparent; color: var(--ink-soft); font-size: 12px; font-weight: 800; cursor: pointer; }
 .mode-tabs button.active { color: var(--ink); background: white; box-shadow: 0 3px 12px rgba(24, 56, 42, 0.08); }
 .product-search, .item-details-form { padding: 24px 28px 30px; }
-.product-search > label, .form-grid label { display: grid; gap: 7px; color: var(--ink-soft); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.product-search > label, .form-grid label, .form-grid .field { display: grid; gap: 7px; color: var(--ink-soft); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+/* Steppers size to their content; stretching one across a form cell leaves the
+   buttons stranded at opposite ends of an oversized pill. */
+.form-grid .quantity-control { justify-self: start; min-height: 46px; }
 .search-field { min-height: 50px; display: flex; align-items: center; gap: 10px; padding: 5px 6px 5px 14px; border: 1px solid var(--line); border-radius: 15px; color: #75877c; background: white; }
 .search-field:focus-within { border-color: #83a54d; box-shadow: 0 0 0 3px rgba(131, 165, 77, 0.12); }
 .search-field input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 13px; }
@@ -228,6 +235,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-grid input, .form-grid select { width: 100%; min-height: 46px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; outline: 0; color: var(--ink); background: white; font-size: 13px; }
 .save-button { margin-top: 21px; }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.detail-actions > button { flex: 1 1 240px; }
+/* Disabled here means "already done", not "saving" — no wait cursor. */
+.detail-actions .secondary-button:disabled { cursor: default; opacity: 1; color: var(--ink-soft); background: var(--mint); }
 
 .scanner-wrap { padding: 20px 28px 28px; text-align: center; }
 .camera-stage { position: relative; height: 290px; overflow: hidden; border-radius: 20px 20px 20px 7px; background: #14241b; }
@@ -295,9 +306,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .panel { border-radius: 23px 23px 23px 7px; }
   .section-heading { padding: 15px; }
   .pantry-list, .pantry-list.roomy { padding: 6px 12px 15px; }
-  .pantry-row { grid-template-columns: auto 1fr auto; gap: 10px; }
+  /* Delete is the one action that keeps its detail-view-only home on phones;
+     add-to-list stays, since that is where a pantry check usually happens. */
+  .pantry-row { grid-template-columns: auto 1fr auto auto; gap: 10px; }
   .pantry-row .date-pill { grid-column: 2; justify-self: start; margin-top: -10px; }
   .pantry-row .quantity-control { grid-column: 3; grid-row: 1 / span 2; }
+  .pantry-row .list-button { grid-column: 4; grid-row: 1 / span 2; }
   .pantry-row .delete-button { display: none; }
   .view-heading { align-items: flex-start; flex-direction: column; padding: 25px 19px 20px; }
   .view-heading h2 { font-size: 38px; }
@@ -335,7 +349,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .hero-stats .wide-stat { display: flex; }
   /* Both flexible columns clip with an ellipsis, so the minimums stay small
      enough for the narrower pantry column of the three-column dashboard. */
-  .pantry-row { grid-template-columns: auto minmax(110px, 1fr) minmax(120px, 0.5fr) auto auto auto; }
+  .pantry-row { grid-template-columns: auto minmax(110px, 1fr) minmax(120px, 0.5fr) auto auto auto auto; }
   .pantry-row .stock-meter { display: block; }
   .wide-detail { display: inline; }
   .inline-search { width: min(460px, calc(100% - 56px)); }
@@ -343,7 +357,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .shop-mode { width: min(880px, 100%); }
   .item-details-form { max-width: 1040px; }
   .item-details-form .form-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .item-details-form .save-button { width: auto; min-width: 280px; }
+  .detail-actions > button { flex: 0 1 300px; }
 }
 
 @media (min-width: 1560px) {
